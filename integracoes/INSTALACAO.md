@@ -73,7 +73,45 @@ Exemplo: o slug `salao-bela` usa `API_AGENDAE_SALAO_BELA`.
 
 Nunca coloque a chave `ag_live_...` no HTML, no widget, em variável JavaScript pública ou em repositório do frontend.
 
-## 4. Criar o proxy no backend do cliente
+## 4. Associar organização e login com `AGENDAE_CONFIG`
+
+O backend do site ou sistema integrado também precisa da variável `AGENDAE_CONFIG`. Ela define qual organização e quais logins do sistema consumidor usam cada variável `API_AGENDAE_*`.
+
+Mesmo para um sistema com apenas uma organização, configure uma entrada. No Render do backend cliente, use `AGENDAE_CONFIG` como nome e um JSON como este no valor:
+
+```json
+{
+  "ORG_DO_SISTEMA": {
+    "apiVariable": "API_AGENDAE_SALAO_BELA",
+    "authorizedEmployeeLogins": ["login.funcionario"]
+  }
+}
+```
+
+- `ORG_DO_SISTEMA`: identificador da organização no sistema integrado.
+- `apiVariable`: nome da variável que guarda a chave exclusiva dessa organização.
+- `authorizedEmployeeLogins`: logins de funcionários autorizados pelo sistema integrado.
+
+Não coloque `ag_live_...` dentro do JSON. O segredo permanece na variável separada `API_AGENDAE_*`.
+
+Em um sistema multiorganizacional, inclua uma entrada por organização:
+
+```json
+{
+  "ORG_0001": {
+    "apiVariable": "API_AGENDAE_CLINICA_CENTRO",
+    "authorizedEmployeeLogins": ["ana.silva"]
+  },
+  "ORG_0002": {
+    "apiVariable": "API_AGENDAE_CLINICA_SUL",
+    "authorizedEmployeeLogins": ["bruno.souza", "carla.lima"]
+  }
+}
+```
+
+Cada organização deve possuir sua própria chave do Agendae e sua própria variável `API_AGENDAE_*`. `AGENDAE_CONFIG` pertence ao sistema consumidor; o Agendae não usa esse JSON para identificar estabelecimentos e não precisa conhecer os códigos internos das organizações externas.
+
+## 5. Criar o proxy no backend do cliente
 
 O navegador conversa somente com o backend do cliente. Esse backend lê `API_AGENDAE_{SLUG}` e encaminha as chamadas para:
 
@@ -98,7 +136,7 @@ Accept: application/json
 
 No `POST`, encaminhe `Content-Type: application/json` e somente os campos `date`, `time`, `professional`, `service`, `client` e `phone`. Configure CORS no backend do cliente para aceitar apenas o domínio público do próprio site.
 
-## 5. Publicar sem interromper a integração
+## 6. Publicar sem interromper a integração
 
 Ao trocar um nome antigo de variável:
 
@@ -131,11 +169,20 @@ Variável nos dois serviços Render:
 API_AGENDAE_OCTN=ag_live_...
 ```
 
+Associação no backend do sistema externo:
+
+```text
+AGENDAE_CONFIG={"ORG_DO_SISTEMA":{"apiVariable":"API_AGENDAE_OCTN","authorizedEmployeeLogins":["login.funcionario"]}}
+```
+
 ## Checklist de entrega
 
 - O arquivo está em `/integracoes/agendae-booking-widget.js`.
 - O botão possui `data-agendae-open`.
 - A tag `<script>` aponta para o backend do cliente, nunca diretamente para a API privada do Agendae.
 - O mesmo segredo está cadastrado nos dois backends.
+- `AGENDAE_CONFIG` está cadastrada no backend do sistema externo.
+- Cada organização aponta para sua própria variável `API_AGENDAE_*` e lista somente seus logins autorizados.
+- O valor `ag_live_...` não aparece dentro de `AGENDAE_CONFIG`.
 - A chave não aparece no código-fonte público.
 - Catálogo, disponibilidade e confirmação foram testados após o deploy.

@@ -1810,6 +1810,11 @@ body:has(.booking-modal-backdrop) { overflow: hidden; }
 .api-key-created p { margin: 5px 0 10px; color: var(--muted); font-size: 12px; }
 .api-key-value { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .api-key-value code { flex: 1 1 250px; overflow-wrap: anywhere; padding: 10px; border-radius: 8px; background: #fff; font-size: 12px; }
+.api-config-contract { display: grid; gap: 12px; padding: 16px; border: 1px solid #b9d6ff; border-radius: 12px; background: #f2f7ff; }
+.api-config-contract > div:first-child > strong { display: block; color: var(--navy); font-size: 14px; }
+.api-config-contract p { margin: 6px 0 0; color: var(--muted); line-height: 1.55; }
+.api-config-contract pre { margin: 0; padding: 12px; overflow: auto; border-radius: 8px; background: #102b4d; color: #e9f2ff; font: 12px/1.5 "SFMono-Regular", Consolas, monospace; white-space: pre-wrap; word-break: break-word; }
+.api-config-contract pre code { color: inherit; }
 .api-endpoints { display: grid; gap: 8px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; }
 .api-endpoints > strong:not(:first-child) { margin-top: 8px; }
 .api-endpoints > code { overflow-wrap: anywhere; padding: 8px 10px; border-radius: 7px; background: #f4f7fb; color: var(--navy); font-size: 12px; }

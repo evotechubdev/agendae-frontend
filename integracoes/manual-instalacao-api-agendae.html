@@ -118,9 +118,41 @@
     <span class="page-number">3</span>
   </section>
 
+  <section class="page" id="agendae-config">
+    <header><img src="../public/imagens/logo_agendae.png" alt="Agendae"><span>ASSOCIAÇÃO NO SISTEMA EXTERNO</span></header>
+    <h2>2. Configurar AGENDAE_CONFIG</h2>
+    <p class="lead">Além da chave secreta, o backend do site ou sistema integrado precisa identificar qual organização e quais logins usam cada API do AGENDAE.</p>
+    <div class="callout"><strong>Variável obrigatória no backend consumidor:</strong><p>crie <code>AGENDAE_CONFIG</code> no Render do sistema externo. Essa variável não é cadastrada no backend do AGENDAE.</p></div>
+    <h3>Sistema com uma organização</h3>
+    <pre>{
+  "ORG_DO_SISTEMA": {
+    "apiVariable": "API_AGENDAE_SALAO_BELA",
+    "authorizedEmployeeLogins": ["login.funcionario"]
+  }
+}</pre>
+    <table><thead><tr><th>Campo</th><th>Preenchimento</th></tr></thead><tbody>
+      <tr><td><code>ORG_DO_SISTEMA</code></td><td>Identificador da organização no sistema integrado.</td></tr>
+      <tr><td><code>apiVariable</code></td><td>Nome da variável que contém a chave exclusiva dessa organização.</td></tr>
+      <tr><td><code>authorizedEmployeeLogins</code></td><td>Logins dos funcionários autorizados no sistema integrado.</td></tr>
+    </tbody></table>
+    <h3>Sistema multiorganizacional</h3>
+    <pre>{
+  "ORG_0001": {
+    "apiVariable": "API_AGENDAE_CLINICA_CENTRO",
+    "authorizedEmployeeLogins": ["ana.silva"]
+  },
+  "ORG_0002": {
+    "apiVariable": "API_AGENDAE_CLINICA_SUL",
+    "authorizedEmployeeLogins": ["bruno.souza", "carla.lima"]
+  }
+}</pre>
+    <div class="callout danger"><strong>Não coloque a chave no JSON:</strong><p><code>AGENDAE_CONFIG</code> guarda apenas o nome <code>API_AGENDAE_*</code>. O valor <code>ag_live_...</code> permanece na variável secreta, exclusiva de cada organização. No Render, o JSON pode ser salvo em uma linha.</p></div>
+    <span class="page-number">4</span>
+  </section>
+
   <section class="page">
     <header><img src="../public/imagens/logo_agendae.png" alt="Agendae"><span>PROXY SEGURO</span></header>
-    <h2>2. Preparar o backend do cliente</h2>
+    <h2>3. Preparar o backend do cliente</h2>
     <p class="lead">Crie um proxy com três rotas públicas. Em cada chamada servidor a servidor, acrescente o cabeçalho de autorização.</p>
     <table><thead><tr><th>Rota no cliente</th><th>Destino no AGENDAE</th><th>Método</th></tr></thead><tbody>
       <tr><td><code>/api/agenda/catalog</code></td><td><code>/catalog</code></td><td>GET</td></tr>
@@ -150,12 +182,12 @@ async function agendaeRequest(path, options = {}) {
     <pre>{ "date", "time", "professional", "service", "client", "phone" }</pre>
     <div class="callout success"><strong>Recomendação:</strong><p>valide formato e tamanho dos campos, limite o corpo JSON, defina timeout para a API e permita CORS somente para o domínio público do cliente.</p></div>
     <div class="callout danger"><strong>Não faça:</strong><p>não devolva a chave no JSON, não registre o cabeçalho Authorization em logs e não aceite uma chave enviada pelo navegador.</p></div>
-    <span class="page-number">4</span>
+    <span class="page-number">5</span>
   </section>
 
   <section class="page">
     <header><img src="../public/imagens/logo_agendae.png" alt="Agendae"><span>FRONTEND E BOTÃO</span></header>
-    <h2>3. Instalar a interface no site</h2>
+    <h2>4. Instalar a interface no site</h2>
     <div class="step"><span class="step-number">1</span><div><h3>Copie o arquivo</h3><p>Coloque o arquivo baixado em uma pasta pública do site:</p><pre>&lt;raiz-pública&gt;/integracoes/agendae-booking-widget.js</pre></div></div>
     <div class="step"><span class="step-number">2</span><div><h3>Adicione o botão</h3><p>O botão pode ficar no cabeçalho, menu ou conteúdo. O atributo abaixo é obrigatório:</p><pre>&lt;button type="button" data-agendae-open&gt;
   Agendamento
@@ -176,12 +208,12 @@ async function agendaeRequest(path, options = {}) {
     <p>A abertura também pode ser controlada por código:</p>
     <pre>window.AgendaeBooking.open();
 window.AgendaeBooking.close();</pre>
-    <span class="page-number">5</span>
+    <span class="page-number">6</span>
   </section>
 
   <section class="page">
     <header><img src="../public/imagens/logo_agendae.png" alt="Agendae"><span>CONFIGURAÇÕES E VALIDAÇÃO</span></header>
-    <h2>4. Modalidades vindas do AGENDAE</h2>
+    <h2>5. Modalidades vindas do AGENDAE</h2>
     <p class="lead">O site cliente não escolhe o funcionamento da agenda. O widget recebe essas configurações no catálogo da API.</p>
     <table><thead><tr><th>Campo</th><th>Valor</th><th>Comportamento</th></tr></thead><tbody>
       <tr><td rowspan="2"><code>bookingMode</code></td><td><code>scheduled</code></td><td>Agendamentos e senhas com escolha de datas futuras.</td></tr>
@@ -192,6 +224,7 @@ window.AgendaeBooking.close();</pre>
     <div class="callout"><strong>Onde alterar:</strong><p><code>bookingMode</code> é escolhido em <strong>Configurações da loja → Dados do estabelecimento → Modalidade de atendimento</strong>. É necessário clicar em <strong>Salvar dados da loja</strong>.</p></div>
     <h3>Checklist antes da entrega</h3>
     <ul class="checklist">
+      <li><code>AGENDAE_CONFIG</code> associa cada organização à sua variável e aos seus logins.</li>
       <li>O mesmo nome e valor da variável existem nos dois backends.</li>
       <li>Os dois serviços foram publicados depois da configuração.</li>
       <li>A chave não aparece no HTML, JavaScript ou repositório público.</li>
@@ -207,7 +240,7 @@ window.AgendaeBooking.close();</pre>
       <li>Escolha um horário, informe nome e telefone e finalize.</li>
       <li>Verifique se a reserva apareceu no painel do estabelecimento no AGENDAE.</li>
     </ol>
-    <span class="page-number">6</span>
+    <span class="page-number">7</span>
   </section>
 
   <section class="page">
@@ -233,7 +266,7 @@ window.AgendaeBooking.close();</pre>
     <p><strong>Backend AGENDAE:</strong><br><code>https://agendae-backend-t5ax.onrender.com</code></p>
     <p><strong>Site AGENDAE:</strong><br><code>https://evotechubdev.github.io/agendae-frontend/</code></p>
     <p class="mini">Documento preparado para distribuição junto com o arquivo oficial do widget. Não inclua chaves reais neste manual.</p>
-    <span class="page-number">7</span>
+    <span class="page-number">8</span>
   </section>
 </body>
 </html>
